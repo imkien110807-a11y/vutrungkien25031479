@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        /* Bật hiệu ứng chuyển trang. Nếu script lỗi, sau 1,5 giây trang vẫn tự hiện. */
+        document.documentElement.classList.add('js');
+        setTimeout(function () { document.documentElement.classList.add('is-ready'); }, 1500);
+    </script>
+    <title>Dự án | Portfolio - Kỹ năng Kỹ thuật số &amp; AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Google Fonts: Playfair Display cho Tiêu đề & Montserrat cho Nội dung -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS + cấu hình màu/phông chữ dùng chung -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fem-1': '#F48FB1',
+                        'fem-2': '#F06292',
+                        'fem-3': '#EC407A',
+                        'fem-4': '#E91E63',
+                        'fem-5': '#D81B60',
+                        'fem-6': '#C2185B',
+                        'fem-7': '#AD1457',
+                        'fem-8': '#880E4F',
+                        'fem-bg': '#FFF7F9', // Màu nền hồng pastel rất nhạt
+                    },
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'Times New Roman', 'serif'],
+                        'montserrat': ['Montserrat', 'Segoe UI', 'Arial', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'elegant': '0 10px 30px -10px rgba(216, 27, 96, 0.15)',
+                        'elegant-hover': '0 20px 40px -10px rgba(136, 14, 79, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+html { scroll-behavior: auto; } /* cuộn mượt do JavaScript xử lý */
+body {
+    background-color: #FFF7F9; color: #4A4A4A;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+/* Tiêu đề: Playfair Display (có đủ dấu tiếng Việt), dự phòng Times New Roman */
+.font-playfair { font-family: 'Playfair Display', 'Times New Roman', serif; }
+.font-montserrat { font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; }
+
+/* Hiệu ứng mờ -> rõ theo tốc độ cuộn (độ mờ/vị trí được JS cập nhật theo vị trí cuộn) */
+.reveal { opacity: 0; will-change: opacity, transform; }
+
+/* Khoảng cách đúng 3 dòng chữ (3 x line-height 1.625rem) */
+.gap-3-lines { height: calc(1.625rem * 3); margin: 0 !important; }
+
+/* Menu thả xuống "Dự án" */
+.nav-dd { position: relative; }
+.nav-dd-panel {
+    position: absolute; left: 50%; top: 100%; width: 22rem; padding-top: 0.9rem;
+    opacity: 0; visibility: hidden; transform: translate(-50%, 8px);
+    transition: opacity .25s ease, transform .25s ease, visibility .25s;
+}
+.nav-dd:hover .nav-dd-panel,
+.nav-dd:focus-within .nav-dd-panel { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.nav-dd.force-close .nav-dd-panel { opacity: 0; visibility: hidden; transform: translate(-50%, 8px); }
+.nav-dd-list { max-height: min(70vh, 26rem); overflow-y: auto; }
+.nav-dd-list::-webkit-scrollbar { width: 8px; }
+.nav-dd-list::-webkit-scrollbar-thumb { background: #F8BBD0; border-radius: 8px; }
+
+/* Styling riêng cho bảng biểu */
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1.5rem; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+th, td { border: 1px solid #F48FB1; padding: 12px 15px; text-align: left; }
+th { background-color: #F48FB1; color: #fff; font-weight: 600; }
+td { color: #555; }
+
+/* ===== Điều hướng giữa 3 trang ===== */
+.tab-link { color: #6b7280; white-space: nowrap; }
+.tab-link:hover, .tab-link.active-tab { color: #880E4F; background: #FFF0F5; }
+
+/* ===== Hiệu ứng chuyển trang =====
+   - Vào trang: cả trang mờ -> rõ, riêng phần nội dung chính trồi lên nhẹ.
+   - Rời trang: mờ dần rồi mới chuyển (do main.js bật class is-leaving).
+   - Chỉ bật khi có JS (class "js"), nên nếu JS lỗi trang vẫn hiển thị bình thường. */
+html.js body { opacity: 0; }
+html.js.is-ready body { opacity: 1; transition: opacity .45s cubic-bezier(.22, .61, .36, 1); }
+html.js.is-ready.is-leaving body { opacity: 0; transition: opacity .22s ease-in; }
+
+html.js.is-ready .page-main { animation: pageRise .6s cubic-bezier(.22, .61, .36, 1) both; }
+@keyframes pageRise { from { transform: translateY(16px); } to { transform: none; } }
+
+/* Khi nhảy tới thẻ bài (projects.html#bai3) không bị thanh điều hướng che */
+[id^="bai"] { scroll-margin-top: 6.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+    html.js body, html.js.is-ready body, html.js.is-ready.is-leaving body { opacity: 1; transition: none; }
+    html.js.is-ready .page-main { animation: none; }
+    .nav-dd-panel { transition: none; }
+}
+
+/* Dự phòng khi chưa có ảnh đại diện (download.jpg) */
+.avatar-fallback { display: flex; align-items: center; justify-content: center; }
+.avatar-fallback::after {
+    content: attr(data-initials); color: #fff; font-weight: 700; letter-spacing: .05em;
+    font-family: 'Playfair Display', 'Times New Roman', serif; font-size: 3.5rem;
+}
+
+    </style>
+    <noscript>
+        <style>
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        </style>
+    </noscript>
+</head>
+
+<body class="font-montserrat antialiased selection:bg-fem-4 selection:text-white">
+
+    <!-- Navigation (dùng chung cho 3 trang) -->
+    <nav
+        class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-fem-1 shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <a href="index.html" class="flex-shrink-0 font-playfair font-bold text-2xl text-fem-8 tracking-wide">
+                    My<span class="text-fem-4">Portfolio.</span>
+                </a>
+                <div class="flex items-center gap-2 md:gap-6 flex-wrap justify-end">
+                    <a href="index.html" class="tab-link px-3 py-2 rounded-full font-semibold transition-colors">Giới thiệu</a>
+                    <div class="nav-dd" id="navProjects">
+                        <a href="projects.html" class="tab-link px-3 py-2 rounded-full font-semibold transition-colors active-tab inline-flex items-center gap-1" aria-haspopup="true" aria-current="page">
+                            Dự án
+                            <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        <div class="nav-dd-panel">
+                            <ul class="nav-dd-list bg-white rounded-2xl border border-pink-100 shadow-elegant-hover py-2">
+                                <li><a href="projects.html#bai1" data-lesson="bai1"
+                                        class="flex items-baseline gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-fem-bg hover:text-fem-6 transition-colors duration-200"><span
+                                            class="font-playfair font-bold text-fem-7 whitespace-nowrap">Bài 1</span><span>Thao tác cơ bản với tệp và thư mục</span></a></li>
+                                <li><a href="projects.html#bai2" data-lesson="bai2"
+                                        class="flex items-baseline gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-fem-bg hover:text-fem-6 transition-colors duration-200"><span
+                                            class="font-playfair font-bold text-fem-7 whitespace-nowrap">Bài 2</span><span>Đánh giá thông tin học thuật</span></a></li>
+                                <li><a href="projects.html#bai3" data-lesson="bai3"
+                                        class="flex items-baseline gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-fem-bg hover:text-fem-6 transition-colors duration-200"><span
+                                            class="font-playfair font-bold text-fem-7 whitespace-nowrap">Bài 3</span><span>Viết Prompt cho tác vụ học tập</span></a></li>
+                                <li><a href="projects.html#bai4" data-lesson="bai4"
+                                        class="flex items-baseline gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-fem-bg hover:text-fem-6 transition-colors duration-200"><span
+                                            class="font-playfair font-bold text-fem-7 whitespace-nowrap">Bài 4</span><span>Giao tiếp &amp; hợp tác môi trường số</span></a></li>
+                                <li><a href="projects.html#bai5" data-lesson="bai5"
+                                        class="flex items-baseline gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-fem-bg hover:text-fem-6 transition-colors duration-200"><span
+                                            class="font-playfair font-bold text-fem-7 whitespace-nowrap">Bài 5</span><span>Sử dụng AI tạo sinh hỗ trợ sáng tạo</span></a></li>
+                                <li><a href="projects.html#bai6" data-lesson="bai6"
+                                        class="flex items-baseline gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-fem-bg hover:text-fem-6 transition-colors duration-200"><span
+                                            class="font-playfair font-bold text-fem-7 whitespace-nowrap">Bài 6</span><span>AI có trách nhiệm &amp; liêm chính</span></a></li>
+                                <li><a href="projects.html#bai7" data-lesson="bai7"
+                                        class="flex items-baseline gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-fem-bg hover:text-fem-6 transition-colors duration-200"><span
+                                            class="font-playfair font-bold text-fem-7 whitespace-nowrap">Bài 7</span><span>Nghiên cứu tổng quan tài liệu khoa học</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="conclusion.html" class="tab-link px-3 py-2 rounded-full font-semibold transition-colors">Tổng kết</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-main">
+    <section id="projects" class="py-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-playfair font-bold text-fem-8 mb-4">Danh Mục Dự Án</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-fem-2 to-fem-6 mx-auto rounded-full"></div>
+            </div>
+
+            <!-- Lưới 7 bài: Giao diện thẻ chi tiết (Card Layout) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-16">
+
+                <!-- Thẻ Bài 1 -->
+                <div id="bai1"
+                    class="lg:col-span-2 reveal bg-white rounded-[2rem] p-8 shadow-[0_10px_40px_-10px_rgba(255,192,203,0.6)] flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span
+                            class="inline-block px-4 py-1.5 bg-pink-50 text-pink-700 text-sm font-bold rounded-2xl">BÀI
+                            1</span>
+                    </div>
+                    <h3 class="text-[26px] font-playfair font-bold text-rose-900 mb-6 leading-[1.3]">Thao tác cơ
+                        bản<br>với tệp và thư mục</h3>
+                    <div class="flex-grow space-y-6">
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">🎯
+                                MỤC TIÊU BÀI TẬP:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Nắm vững các thao tác quản
+                                lý tệp tin, thư mục cơ bản trên hệ điều hành Windows để làm việc...</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">📝
+                                TÓM TẮT THỰC HIỆN:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Thực hành tạo, sao chép, di
+                                chuyển, xóa, và khôi phục tệp tin. Xây dựng cây thư mục lưu trữ khoa học...</p>
+                        </div>
+                    </div>
+                    <hr class="my-6 border-pink-50">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[15px] text-gray-400 w-1/2 leading-snug">Kỹ năng tin học<br>cơ bản</span>
+                        <a href="https://drive.google.com/file/d/1wYTPZ7bHoF_gtyYLrzwYsLPCIBlleSBP/view?usp=sharing"
+                            target="_blank"
+                            class="text-rose-600 font-bold text-[17px] flex items-center gap-3 text-right group cursor-pointer">
+                            <span class="leading-tight">Xem minh<br>chứng</span>
+                            <span
+                                class="text-xl font-light group-hover:translate-x-1 transition-transform">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Thẻ Bài 2 -->
+                <div id="bai2"
+                    class="lg:col-span-2 reveal bg-white rounded-[2rem] p-8 shadow-[0_10px_40px_-10px_rgba(255,192,203,0.6)] flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span
+                            class="inline-block px-4 py-1.5 bg-pink-50 text-pink-700 text-sm font-bold rounded-2xl">BÀI
+                            2</span>
+                    </div>
+                    <h3 class="text-[26px] font-playfair font-bold text-rose-900 mb-6 leading-[1.3]">Đánh giá
+                        thông<br>tin học thuật</h3>
+                    <div class="flex-grow space-y-6">
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">🎯
+                                MỤC TIÊU BÀI TẬP:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Tìm kiếm, sàng lọc và đánh
+                                giá độ tin cậy của các tài liệu khoa học về chủ đề Machine Learning.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">📝
+                                TÓM TẮT THỰC HIỆN:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Lập bảng đánh giá chuyên sâu
+                                4 tài liệu khoa học dựa trên 5 tiêu chí uy tín cốt lõi trong nghiên cứu.</p>
+                        </div>
+                    </div>
+                    <hr class="my-6 border-pink-50">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[15px] text-gray-400 w-1/2 leading-snug">Kỹ năng nghiên<br>cứu số</span>
+                        <a href="https://drive.google.com/file/d/1h-a0w6WMEj6YASdJvIaLxCRexYDlC1i2/view?usp=sharing"
+                            target="_blank"
+                            class="text-rose-600 font-bold text-[17px] flex items-center gap-3 text-right group cursor-pointer">
+                            <span class="leading-tight">Xem minh<br>chứng</span>
+                            <span
+                                class="text-xl font-light group-hover:translate-x-1 transition-transform">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Thẻ Bài 3 -->
+                <div id="bai3"
+                    class="lg:col-span-2 reveal bg-white rounded-[2rem] p-8 shadow-[0_10px_40px_-10px_rgba(255,192,203,0.6)] flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span
+                            class="inline-block px-4 py-1.5 bg-pink-50 text-pink-700 text-sm font-bold rounded-2xl">BÀI
+                            3</span>
+                    </div>
+                    <h3 class="text-[26px] font-playfair font-bold text-rose-900 mb-6 leading-[1.3]">Viết Prompt
+                        cho<br>tác vụ học tập</h3>
+                    <div class="flex-grow space-y-6">
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">🎯
+                                MỤC TIÊU BÀI TẬP:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Ứng dụng kỹ thuật Prompt
+                                Engineering để tối ưu hóa truy vấn, khai thác tối đa sức mạnh của AI...</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">📝
+                                TÓM TẮT THỰC HIỆN:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Thực hành nâng cấp prompt từ
+                                cơ bản đến phức tạp (Role-prompting) với chủ đề Triết học Mác - Lênin.</p>
+                        </div>
+                    </div>
+                    <hr class="my-6 border-pink-50">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[15px] text-gray-400 w-1/2 leading-snug">Prompt<br>Engineering</span>
+                        <a href="https://drive.google.com/file/d/1wvueyVhZjeKHlsF6-Hy0XUSAV7f3CLqx/view?usp=sharing"
+                            target="_blank"
+                            class="text-rose-600 font-bold text-[17px] flex items-center gap-3 text-right group cursor-pointer">
+                            <span class="leading-tight">Xem minh<br>chứng</span>
+                            <span
+                                class="text-xl font-light group-hover:translate-x-1 transition-transform">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Thẻ Bài 4 -->
+                <div id="bai4"
+                    class="lg:col-span-2 reveal bg-white rounded-[2rem] p-8 shadow-[0_10px_40px_-10px_rgba(255,192,203,0.6)] flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span
+                            class="inline-block px-4 py-1.5 bg-pink-50 text-pink-700 text-sm font-bold rounded-2xl">BÀI
+                            4</span>
+                    </div>
+                    <h3 class="text-[26px] font-playfair font-bold text-rose-900 mb-6 leading-[1.3]">Giao tiếp & hợp
+                        tác<br>môi trường số</h3>
+                    <div class="flex-grow space-y-6">
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">🎯
+                                MỤC TIÊU BÀI TẬP:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Phối hợp nhịp nhàng các công
+                                cụ trực tuyến để điều phối, quản lý tiến độ và xử lý tài nguyên...</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">📝
+                                TÓM TẮT THỰC HIỆN:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Sử dụng Trello, Google Docs
+                                và Drive để triển khai thành công dự án nhóm "AI và Công nghệ số".</p>
+                        </div>
+                    </div>
+                    <hr class="my-6 border-pink-50">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[15px] text-gray-400 w-1/2 leading-snug">Quản trị<br>dự án số</span>
+                        <a href="https://drive.google.com/file/d/1uR0D2YRqoVsyM5bux2lzsxbAHWECDDCt/view?usp=sharing"
+                            target="_blank"
+                            class="text-rose-600 font-bold text-[17px] flex items-center gap-3 text-right group cursor-pointer">
+                            <span class="leading-tight">Xem minh<br>chứng</span>
+                            <span
+                                class="text-xl font-light group-hover:translate-x-1 transition-transform">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Thẻ Bài 5 -->
+                <div id="bai5"
+                    class="lg:col-span-2 reveal bg-white rounded-[2rem] p-8 shadow-[0_10px_40px_-10px_rgba(255,192,203,0.6)] flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span
+                            class="inline-block px-4 py-1.5 bg-pink-50 text-pink-700 text-sm font-bold rounded-2xl">BÀI
+                            5</span>
+                    </div>
+                    <h3 class="text-[26px] font-playfair font-bold text-rose-900 mb-6 leading-[1.3]">Sử dụng AI tạo
+                        sinh<br>hỗ trợ sáng tạo</h3>
+                    <div class="flex-grow space-y-6">
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">🎯
+                                MỤC TIÊU BÀI TẬP:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Làm chủ các nền tảng AI tạo
+                                văn bản và hình ảnh để gia tăng hiệu suất thiết kế đa phương tiện.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">📝
+                                TÓM TẮT THỰC HIỆN:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Kết hợp ChatGPT, Midjourney
+                                và Canva thiết kế cẩm nang "Ứng dụng AI trong dịch thuật văn hóa".</p>
+                        </div>
+                    </div>
+                    <hr class="my-6 border-pink-50">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[15px] text-gray-400 w-1/2 leading-snug">Sáng tạo<br>nội dung</span>
+                        <a href="https://drive.google.com/file/d/11myhA6b0Wct6P7y16eCkvWX5SA8JP1IL/view?usp=sharing"
+                            target="_blank"
+                            class="text-rose-600 font-bold text-[17px] flex items-center gap-3 text-right group cursor-pointer">
+                            <span class="leading-tight">Xem minh<br>chứng</span>
+                            <span
+                                class="text-xl font-light group-hover:translate-x-1 transition-transform">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Thẻ Bài 6 -->
+                <div id="bai6"
+                    class="lg:col-span-2 reveal bg-white rounded-[2rem] p-8 shadow-[0_10px_40px_-10px_rgba(255,192,203,0.6)] flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span
+                            class="inline-block px-4 py-1.5 bg-pink-50 text-pink-700 text-sm font-bold rounded-2xl">BÀI
+                            6</span>
+                    </div>
+                    <h3 class="text-[26px] font-playfair font-bold text-rose-900 mb-6 leading-[1.3]">AI có trách nhiệm
+                        &<br>liêm chính</h3>
+                    <div class="flex-grow space-y-6">
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">🎯
+                                MỤC TIÊU BÀI TẬP:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Hiểu rõ ranh giới giữa việc
+                                ứng dụng AI như một công cụ hỗ trợ và các hành vi gian lận học thuật.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">📝
+                                TÓM TẮT THỰC HIỆN:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Phân tích chính sách của
+                                trường đại học và xây dựng bộ 5 nguyên tắc cá nhân khi sử dụng trí tuệ...</p>
+                        </div>
+                    </div>
+                    <hr class="my-6 border-pink-50">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[15px] text-gray-400 w-1/2 leading-snug">Đạo đức<br>học thuật</span>
+                        <a href="https://drive.google.com/file/d/1unzPrIpVQC89QFmPWraLGpqSKp3G01HD/view?usp=sharing"
+                            target="_blank"
+                            class="text-rose-600 font-bold text-[17px] flex items-center gap-3 text-right group cursor-pointer">
+                            <span class="leading-tight">Xem minh<br>chứng</span>
+                            <span
+                                class="text-xl font-light group-hover:translate-x-1 transition-transform">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Thẻ Bài 7 (canh giữa ở hàng cuối) -->
+                <div id="bai7"
+                    class="md:col-span-2 md:w-[calc(50%-1rem)] md:justify-self-center lg:col-span-2 lg:col-start-3 lg:w-auto lg:justify-self-stretch reveal bg-white rounded-[2rem] p-8 shadow-[0_10px_40px_-10px_rgba(255,192,203,0.6)] flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span
+                            class="inline-block px-4 py-1.5 bg-pink-50 text-pink-700 text-sm font-bold rounded-2xl">BÀI
+                            7</span>
+                    </div>
+                    <h3 class="text-[26px] font-playfair font-bold text-rose-900 mb-6 leading-[1.3]">Nghiên cứu tổng
+                        quan<br>tài liệu khoa học</h3>
+                    <div class="flex-grow space-y-6">
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">🎯
+                                MỤC TIÊU BÀI TẬP:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Ứng dụng trợ lý AI chuyên
+                                dụng (Elicit, Consensus) để tự động hóa quy trình tìm kiếm và bóc...</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[15px] font-bold text-rose-600 mb-2 uppercase flex items-center gap-2">📝
+                                TÓM TẮT THỰC HIỆN:</h4>
+                            <p class="text-gray-500 text-base leading-relaxed line-clamp-3">Đánh giá tiềm năng vật liệu
+                                Graphene trong pin Lithium-ion. Tổng hợp, so sánh 6 bài báo tiê...</p>
+                        </div>
+                    </div>
+                    <hr class="my-6 border-pink-50">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[15px] text-gray-400 w-1/2 leading-snug">Ứng dụng AI học<br>thuật</span>
+                        <a href="https://drive.google.com/file/d/18vS0_6pySUGchMBC1gI3PFxP6GndnGID/view?usp=sharing"
+                            target="_blank"
+                            class="text-rose-600 font-bold text-[17px] flex items-center gap-3 text-right group cursor-pointer">
+                            <span class="leading-tight">Xem minh<br>chứng</span>
+                            <span
+                                class="text-xl font-light group-hover:translate-x-1 transition-transform">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="text-center">
+                <a href="conclusion.html" class="inline-block px-10 py-4 bg-gradient-to-r from-fem-6 to-fem-4 text-white font-medium rounded-full shadow-[0_8px_20px_rgba(216,27,96,0.3)] hover:shadow-[0_10px_25px_rgba(216,27,96,0.5)] hover:-translate-y-1 transition-all duration-300 tracking-wide">Xem Tổng Kết &rarr;</a>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <footer class="bg-white py-8 text-center border-t border-fem-1">
+        <p class="text-gray-400 font-montserrat text-sm tracking-wide">© 2026 MyPortfolio. Thiết kế thanh lịch với sự hỗ trợ từ AI.</p>
+    </footer>
+
+    <!-- Script: cuộn mượt, hiện dần theo cuộn, chuyển trang mượt, cuộn tới bài từ menu -->
+    <script>
+(function () {
+    'use strict';
+
+    const NAV_OFFSET = 80; // chiều cao thanh điều hướng (h-20)
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ====== HIỆN DẦN THEO TỐC ĐỘ CUỘN ====== */
+    const revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+
+    function updateReveal() {
+        const vh = window.innerHeight;
+        const start = vh * 0.97;   // phần tử bắt đầu hiện khi chạm mép dưới màn hình
+        const span = vh * 0.27;    // hiện rõ hoàn toàn sau khi đi lên khoảng 27% chiều cao màn hình
+        for (let i = 0; i < revealEls.length; i++) {
+            const el = revealEls[i];
+            const r = el.getBoundingClientRect();
+            if (r.width === 0 && r.height === 0) continue; // đang nằm trong tab bị ẩn
+            let p = 1;
+            if (!reduceMotion) {
+                const baseTop = r.top - (el._shift || 0);
+                const lag = (parseFloat(el.dataset.lag) || 0) * vh * 0.05;
+                p = (start - lag - baseTop) / span;
+                p = p < 0 ? 0 : (p > 1 ? 1 : p);
+            }
+            const shift = (1 - p) * 40;
+            el._shift = shift;
+            el.style.opacity = p.toFixed(3);
+            el.style.transform = p >= 1 ? 'none' : 'translate3d(0,' + shift.toFixed(1) + 'px,0)';
+        }
+    }
+
+    /* ====== CUỘN MƯỢT (quán tính) ====== */
+    let current = window.scrollY, target = current, running = false, lastT = 0;
+
+    function maxScroll() {
+        return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    }
+
+    function frame(t) {
+        const dt = Math.min(50, t - (lastT || t));
+        lastT = t;
+        const diff = target - current;
+        if (Math.abs(diff) < 0.4) {
+            current = target;
+            running = false;
+        } else {
+            current += diff * (1 - Math.pow(1 - 0.11, dt / 16.67));
+        }
+        window.scrollTo(0, current);
+        updateReveal();
+        if (running) requestAnimationFrame(frame); else lastT = 0;
+    }
+
+    function smoothTo(y) {
+        target = Math.max(0, Math.min(maxScroll(), y));
+        if (reduceMotion) {
+            window.scrollTo(0, target);
+            current = target;
+            updateReveal();
+            return;
+        }
+        if (!running) {
+            current = window.scrollY;
+            running = true;
+            requestAnimationFrame(frame);
+        }
+    }
+
+    function canScrollInside(node, dy) {
+        while (node && node !== document.body && node !== document.documentElement) {
+            if (node.nodeType === 1) {
+                const oy = getComputedStyle(node).overflowY;
+                if ((oy === 'auto' || oy === 'scroll') && node.scrollHeight > node.clientHeight + 1) {
+                    const atTop = node.scrollTop <= 0;
+                    const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1;
+                    if ((dy < 0 && !atTop) || (dy > 0 && !atBottom)) return true;
+                }
+            }
+            node = node.parentNode;
+        }
+        return false;
+    }
+
+    if (!reduceMotion) {
+        window.addEventListener('wheel', function (e) {
+            if (e.ctrlKey || e.defaultPrevented) return;
+            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+            let dy = e.deltaY;
+            if (e.deltaMode === 1) dy *= 32;
+            else if (e.deltaMode === 2) dy *= window.innerHeight;
+            if (canScrollInside(e.target, dy)) return;
+            e.preventDefault();
+            if (!running) { current = window.scrollY; target = current; }
+            target = Math.max(0, Math.min(maxScroll(), target + dy));
+            if (!running) { running = true; requestAnimationFrame(frame); }
+        }, { passive: false });
+    }
+
+    // Cuộn bằng bàn phím / kéo thanh cuộn: đồng bộ lại vị trí
+    window.addEventListener('scroll', function () {
+        if (running && Math.abs(window.scrollY - current) > 3) running = false;
+        if (!running) { current = target = window.scrollY; }
+        updateReveal();
+    }, { passive: true });
+
+    window.addEventListener('resize', updateReveal);
+
+    /* ====== MENU "DỰ ÁN" → CUỘN TỚI THẺ BÀI ====== */
+    function docTop(el) {          // offsetTop cộng dồn: không bị ảnh hưởng bởi transform đang chạy
+        let y = 0;
+        while (el) { y += el.offsetTop; el = el.offsetParent; }
+        return y;
+    }
+
+    function goToLesson(id) {
+        const card = document.getElementById(id);
+        if (!card) return false;
+        smoothTo(docTop(card) - NAV_OFFSET - 20);
+        return true;
+    }
+
+    const dd = document.getElementById('navProjects');
+    if (dd) dd.addEventListener('mouseleave', function () { dd.classList.remove('force-close'); });
+
+    /* ====== CHUYỂN TRANG MƯỢT ====== */
+    const root = document.documentElement;
+    let leaving = false;
+
+    function leaveTo(href) {
+        if (leaving) return;
+        leaving = true;
+        root.classList.add('is-leaving');           // mờ dần ~0.22s rồi mới chuyển
+        setTimeout(function () { window.location.href = href; }, 220);
+    }
+
+    // Quay lại bằng nút Back (trang lấy từ bộ nhớ đệm): bỏ trạng thái đang rời
+    window.addEventListener('pageshow', function (e) {
+        if (e.persisted) {
+            leaving = false;
+            root.classList.remove('is-leaving');
+            root.classList.add('is-ready');
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        const a = e.target.closest('a');
+        if (!a) return;
+        if (dd && dd.contains(a)) { dd.classList.add('force-close'); a.blur(); }
+
+        // Đang ở trang Dự án và bấm bài trong menu: cuộn mượt tại chỗ.
+        if (a.dataset.lesson) {
+            const id = a.hash.replace('#', '');
+            if (document.getElementById(id)) {
+                e.preventDefault();
+                try { history.pushState(null, '', '#' + id); } catch (err) { /* file:// */ }
+                goToLesson(id);
+                return;
+            }
+        }
+
+        // Link sang trang khác trong web: mờ dần rồi chuyển
+        if (reduceMotion || e.defaultPrevented || e.button !== 0 ||
+            e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        if (a.target === '_blank' || a.hasAttribute('download') || !a.getAttribute('href')) return;
+        const url = new URL(a.href, window.location.href);
+        if (url.protocol !== window.location.protocol || url.host !== window.location.host) return;
+        if (url.pathname === window.location.pathname) {          // cùng trang
+            if (!url.hash) { e.preventDefault(); smoothTo(0); }   // bấm đúng tab đang mở: cuộn lên đầu
+            return;
+        }
+        e.preventDefault();
+        leaveTo(url.href);
+    });
+
+    window.addEventListener('popstate', function () {
+        const id = window.location.hash.replace('#', '');
+        if (/^bai\d+$/.test(id)) goToLesson(id);
+    });
+
+    /* ====== KHỞI TẠO ====== */
+    updateReveal();
+
+    function markReady() { root.classList.add('is-ready'); }
+    requestAnimationFrame(function () {
+        const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+        Promise.race([fontsReady, new Promise(function (r) { setTimeout(r, 700); })]).then(function () {
+            requestAnimationFrame(function () { requestAnimationFrame(markReady); });
+        });
+    });
+
+    const initial = window.location.hash.replace('#', '');
+    if (/^bai\d+$/.test(initial) && document.getElementById(initial)) {
+        // mở thẳng projects.html#baiN: chờ Tailwind áp style xong rồi cuộn tới thẻ
+        window.addEventListener('load', function () {
+            setTimeout(function () { goToLesson(initial); }, 80);
+        });
+    }
+})();
+    </script>
+</body>
+
+</html>

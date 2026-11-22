@@ -1,0 +1,59 @@
+html { scroll-behavior: auto; } /* cuộn mượt do JavaScript xử lý */
+body {
+    background-color: #FFF7F9; color: #4A4A4A;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+/* Tiêu đề: Playfair Display (có đủ dấu tiếng Việt), dự phòng Times New Roman */
+.font-playfair { font-family: 'Playfair Display', 'Times New Roman', serif; }
+.font-montserrat { font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; }
+
+/* Hiệu ứng mờ -> rõ theo tốc độ cuộn (độ mờ/vị trí được JS cập nhật theo vị trí cuộn) */
+.reveal { opacity: 0; will-change: opacity, transform; }
+
+/* Khoảng cách đúng 3 dòng chữ (3 x line-height 1.625rem) */
+.gap-3-lines { height: calc(1.625rem * 3); margin: 0 !important; }
+
+/* Menu thả xuống "Dự án" */
+.nav-dd { position: relative; }
+.nav-dd-panel {
+    position: absolute; left: 50%; top: 100%; width: 22rem; padding-top: 0.9rem;
+    opacity: 0; visibility: hidden; transform: translate(-50%, 8px);
+    transition: opacity .25s ease, transform .25s ease, visibility .25s;
+}
+.nav-dd:hover .nav-dd-panel,
+.nav-dd:focus-within .nav-dd-panel { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.nav-dd.force-close .nav-dd-panel { opacity: 0; visibility: hidden; transform: translate(-50%, 8px); }
+.nav-dd-list { max-height: min(70vh, 26rem); overflow-y: auto; }
+.nav-dd-list::-webkit-scrollbar { width: 8px; }
+.nav-dd-list::-webkit-scrollbar-thumb { background: #F8BBD0; border-radius: 8px; }
+
+/* Styling riêng cho bảng biểu */
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1.5rem; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+th, td { border: 1px solid #F48FB1; padding: 12px 15px; text-align: left; }
+th { background-color: #F48FB1; color: #fff; font-weight: 600; }
+td { color: #555; }
+
+/* ===== Điều hướng giữa 3 trang ===== */
+.tab-link { color: #6b7280; white-space: nowrap; }
+.tab-link:hover, .tab-link.active-tab { color: #880E4F; background: #FFF0F5; }
+
+/* ===== Hiệu ứng chuyển trang =====
+   - Vào trang: cả trang mờ -> rõ, riêng phần nội dung chính trồi lên nhẹ.
+   - Rời trang: mờ dần rồi mới chuyển (do main.js bật class is-leaving).
+   - Chỉ bật khi có JS (class "js"), nên nếu JS lỗi trang vẫn hiển thị bình thường. */
+html.js body { opacity: 0; }
+html.js.is-ready body { opacity: 1; transition: opacity .45s cubic-bezier(.22, .61, .36, 1); }
+html.js.is-ready.is-leaving body { opacity: 0; transition: opacity .22s ease-in; }
+
+html.js.is-ready .page-main { animation: pageRise .6s cubic-bezier(.22, .61, .36, 1) both; }
+@keyframes pageRise { from { transform: translateY(16px); } to { transform: none; } }
+
+/* Khi nhảy tới thẻ bài (projects.html#bai3) không bị thanh điều hướng che */
+[id^="bai"] { scroll-margin-top: 6.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+    html.js body, html.js.is-ready body, html.js.is-ready.is-leaving body { opacity: 1; transition: none; }
+    html.js.is-ready .page-main { animation: none; }
+    .nav-dd-panel { transition: none; }
+}
